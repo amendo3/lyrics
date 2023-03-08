@@ -1,28 +1,17 @@
-import csv
+import csv # get csv module in order to import the spreadsheet from this folder and get data from it (our
+# artist names most importantly.)
 
+# empty indexes
 lines = []
 artists = []
+
+#open the file with names and make DictReader object with "headers"
 artistFile = open('artists.csv')
 csvReader = csv.DictReader(artistFile, ['number', 'name'])
-#csvData = list(csvReader)
 
+# for as many rows as are in the document, take the first column with header 'number' and append it to the empty
+# lines index. same with second column header 'name' being appended to empty artists index.
 for row in csvReader:
-	if csvReader.line_num == 1:
-		artists.append(row['name'])
-	elif csvReader.line_num == 2:
-		artists.append(row['name'])
-	elif csvReader.line_num == 3:
-		artists.append(row['name'])
-	elif csvReader.line_num == 4:
-		artists.append(row['name'])
-	elif csvReader.line_num == 5:
-		artists.append(row['name'])
-	else:
-		print('logic is surely fucked')
+	lines.append(row['number'])
+	artists.append(row['name'])
 
-for row in csvReader:
-	lines.append(row['name'])
-
-
-print(lines)
-print(artists)
