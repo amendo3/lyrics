@@ -1,7 +1,7 @@
 import csv # get csv module in order to import the spreadsheet from this folder and get data from it (our
 # artist names most importantly.)
 
-# empty indexes
+# empty lists
 lines = []
 artists = []
 
