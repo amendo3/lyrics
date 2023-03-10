@@ -1,12 +1,13 @@
 # import modules required, as well as auxillary files with function necessary
-import requests, api_key, reader
+import requests, csv, api_key, reader
 from bs4 import BeautifulSoup
 
 #set variable for api token, pull real token from .gitignored api_key file
 client_access_token = api_key.your_client_access_token
 
-# global variables being used
+# global values being used
 search_term = None
+artist = []
 
 
 def artistPicker(list):
