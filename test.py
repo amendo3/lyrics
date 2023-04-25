@@ -8,6 +8,7 @@ artist = []
 ids = []
 albums_ids = []
 albums_name_list = []
+artist_name_list = []
 albums_release_date = []
 songs_release_date = []
 tracklist_urls = []
@@ -37,6 +38,8 @@ def artistID(list):
 			if hit['result']['primary_artist']['name'] == search_term:
 				primary_artist_id = hit['result']['primary_artist']['id']
 				ids.append(primary_artist_id)
+				primary_artist_name = hit['result']['primary_artist']['name']
+				artist_name_list.append(primary_artist_name)
 				break
 
 
@@ -87,22 +90,38 @@ def songList(list):
 		tracklist_urls.append(public_url_tracklist)
 		
 
+def createArtistFolder(list, nlist):
+	for h in list:
+		artist_name_term = str(h)
+		parent_dir = "/Users/amendo/repos/lyrics/files"
+		# parent_dir2 = f"/Users/amendo/repos/lyrics/files/{artist_name_term}"
+		path = os.path.join(parent_dir, artist_name_term)
+		# path2 = os.path.join(parent_dir2, artist_name_term)
 
+		# makes artist folder
+		try:
+			os.mkdir(path)
+		except OSError as error:
+			print(error)
+
+		# goes into the above artist folder and creates a folder THERE
+		# (for now this is just the author again, but will be folders for each album shortly)
 		
+		# try:
+		# 	os.mkdir(path2)
+		# except OSError as error:
+		# 	print(error)
 
+	for x in nlist:
+		album_name_term = str(x)
+		parent_dir2 = f"/Users/amendo/repos/lyrics/files/{artist_name_term}"
+		path2 = os.path.join(parent_dir2, album_name_term)
 
+		try:
+			os.mkdir(path2)
+		except OSError as error:
+			print(error) 
 
-		# for i in range(10):
-			# full_title = json_data['response']['hits'][i]['result']['full_title']
-			# print(full_title)
-			# release_date = json_data['response']['hits'][i]['result']['release_date_components']
-			# print(release_date)
-			# song_path = json_data['response']['hits'][i]['result']['path']
-			# print(song_path)
-			# song_api_path = json_data['response']['hits'][i]['result']['api_path']
-			# print(song_api_path)
-			# artist_id = json_data['response']['hits'][i]['result']['primary_artist']['id']
-			
 
 
 			# Both of these are not allowed within my scope: (will need to scrape)
@@ -125,6 +144,10 @@ artistID(artist)
 albumList(ids)
 
 songList(albums_ids)
+createArtistFolder(artist_name_list, albums_name_list)
+
+# create a file with ARTIST NAME
+# createArtistFolder(artist_name_list, albums_name_list)
 
 
 length2 = len(albums_ids)
