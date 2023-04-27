@@ -77,15 +77,18 @@ class testScrape():
 		url = 'http://genius.com/songs/70324'
 		page = requests.get(url)
 		html = BeautifulSoup(page.text, "html.parser")
-		[words.extract() for words in html('script')]
-		lyrics_div = html.find("div", class_=re.compile('^.*Lyrics__Container.*$'))
-		lyrics = ''
-		for element in lyrics_div.children:
-			if element.name == 'br':
-				lyrics += '\n'
-			elif element.string:
-				lyrics += element.string.strip() + ' '
-		print(lyrics)
+		# [h.extract() for h in html('script')]
+		# lyrics = html.find("div", class_=re.compile('^.*Lyrics__Container.*$')).get_text(separator='\n')
+		# print(lyrics)
+
+		for words in html.select('div[class^="Lyrics__Container"]'):
+			for lines in words.select('i'):
+				lines.unwrap()
+			words.smooth()
+
+			lyrics = words.get_text(strip=True, separator='\n')
+			if lyrics:
+				print(lyrics)
 
 	def program(self):
 		self.pick_artist()
