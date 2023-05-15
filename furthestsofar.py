@@ -1,4 +1,4 @@
-import requests, api_key, reader, os, re
+import requests, api_key, reader, os, re, csv
 from bs4 import BeautifulSoup
 
 class testScrape():
@@ -11,6 +11,7 @@ class testScrape():
 		self.albums_name_list = []
 		self.albums_release_date = []
 		self.artist_id_term = []
+		self.tracklist_urls = []
 		self.search_term = None
 
 	def pick_artist(self):
@@ -22,6 +23,24 @@ class testScrape():
 		self.artist.append(name)
 
 		print(name)
+
+	def file_opener(self):
+		file = open('artists.csv')
+		fileReader = csv.DictReader(file, ['name'])
+
+		for row in fileReader:
+			self.artist.append(row['name'])
+
+	def createArtistFolder(self, artist):
+		for people in artist:
+			name = str(people)
+			parent_dir = "/Users/amendo/repos/lyrics/files"
+			path = os.path.join(parent_dir, name)
+
+			try:
+				os.mkdir(path)
+			except OSError as error:
+				print(error)
 
 	def artist_id(self, artist):
 		print('artist_id: getting api url and artist id...')
@@ -73,6 +92,17 @@ class testScrape():
 			print('albums_name_list = ' + str(self.albums_name_list))
 			print('albums_release_date = ' + str(self.albums_release_date))
 
+	def song_list(self, albums_ids):
+		print('songList: Getting public api url for each specific album and tracklist...')
+		for aid in albums_ids:
+			album_id_term = aid
+			public_url_tracklist = f"http://genius.com/api{album_id_term}/tracks"
+			self.tracklist_urls.append(public_url_tracklist)
+
+
+		print(self.tracklist_urls)
+
+
 	def get_html(self):
 		url = 'http://genius.com/songs/70324'
 		page = requests.get(url)
@@ -82,7 +112,7 @@ class testScrape():
 		# print(lyrics)
 
 		for words in html.select('div[class^="Lyrics__Container"]'):
-			for lines in words.select('i'):
+			for lines in words.select('i, b'):
 				lines.unwrap()
 			words.smooth()
 
@@ -91,15 +121,15 @@ class testScrape():
 				print(lyrics)
 
 	def program(self):
-		self.pick_artist()
+		self.file_opener()
+		self.createArtistFolder(self.artist)
 		self.artist_id(self.artist)
 		self.album_list(self.ids)
+		self.song_list(self.albums_ids)
 
-	def program2(self):
-		self.get_html()
 
 scrape = testScrape()
-scrape.program2()
+scrape.program()
 
 
 

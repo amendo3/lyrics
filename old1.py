@@ -1,3 +1,11 @@
+
+
+# first time trying classes with this but not the best file. test2.py is the best rn
+
+
+
+
+
 # import modules required, as well as auxillary files with function necessary
 import requests, csv, api_key, reader, os
 from bs4 import BeautifulSoup
