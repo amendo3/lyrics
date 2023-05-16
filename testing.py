@@ -22,11 +22,6 @@ class artistReader():
 			csv_reader = csv.reader(file)
 
 			for row in csv_reader:
-				# previous method
-				# artist_name = row[0]
-				# self.artists.append(artist_name)
-
-				#new method
 				artist_name = row[0]
 				artist = Artist(artist_name)
 				self.artists.append(artist)
@@ -49,9 +44,7 @@ class artistIdScraper():
 				artist_name = hit['result']['primary_artist']['name']
 				if id_search_term.lower().replace(',', '') == artist_name.lower().replace(',', ''):
 					primary_artist_id = hit['result']['primary_artist']['id']
-					# self.ids1.append(primary_artist_id)
-					# primary_artist_name = hit['result']['primary_artist']['name']
-					# self.artists_name_list1.append(primary_artist_name)
+
 					artist.ids = primary_artist_id
 					break
 
@@ -60,13 +53,9 @@ class lyrics():
 		self.artist_reader = artistReader('artists.csv')
 		self.artists = self.artist_reader.read_artists()
 		self.artist_id_scraper = artistIdScraper(self.artists)
-		# self.artist_id_scraper.scraper(self.artists)
-		# self.ids = self.artist_id_scraper.ids1
 
 
-		self.albums_ids1 = []
-		self.albums_names_list1 = []
-		self.albums_release_date1 = []
+		self.albums = []
 
 	def artistFolder(self, list):
 		for names in list:
@@ -84,11 +73,11 @@ class lyrics():
 		self.artist_id_scraper.scraper()
 	
 	def album_list(self):
-		alb = self.artists
-
-		for aid in alb:
-			artist_id_term = aid
+		for artist in self.artists:
+			artist_id_term = artist.ids
 			public_url_albums = f"http://genius.com/api/artists/{artist_id_term}/albums?per_page=50/"
+
+			print(public_url_albums)
 
 			response = requests.get(public_url_albums)
 			album_json_data = response.json()
@@ -98,16 +87,16 @@ class lyrics():
 					album = Album()
 
 					album_id = albums['api_path']
-					album.url_list = album_id
-					self.albums_ids1.append(album_id)
+					album.ids = album_id
 
 					albums_name = albums['name']
-					album.name = albums_names
-					self.albums_name_list1.append(albums_name)
+					album.name = albums_name
 
 					albums_date = albums['release_date_for_display']
 					album.date = albums_date
-					self.albums_release_date1.append(albums_date)
+
+					self.albums.append(album)
+
 
 				else:
 					print('ALBUM LIST ERROR')
@@ -115,21 +104,11 @@ class lyrics():
 
 
 	def test(self):
-		# print(self.artists)
-		# self.artistFolder(self.artists)
-		# print(self.ids)
 		print([artist.name for artist in self.artists])
 		print([artist.ids for artist in self.artists])
-		# instance1 = self.artists[0]
-		# print(instance1.name)
-		# print(instance1.ids)
-		# instance2 = self.artists[2]
-		# print(instance2.name)
-		# print(instance2.ids)
-		instance = Album()
-		print(instance.ids)
 
-
+		for album in self.albums:
+			print(album.ids)
 
 run = lyrics()
 run.get_artist_ids()
