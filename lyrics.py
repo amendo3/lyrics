@@ -134,12 +134,20 @@ class getLyrics():
 					songs_date = tracks['song']['release_date_with_abbreviated_month_for_display']
 					self.songs_dates1.append(songs_date)
 
+	def write_lists_to_files(self, *lists):
+		for i, lst in enumerate(lists):
+			with open(f'list_{i+1}.txt', 'w') as f:
+				for item in lst:
+					f.write(str(item) + '\n')
+
 	def program_run(self):
 		self.artist_simple()
 		self.artistFolder_simple(self.artist1)
 		self.artist_id_simple(self.artist1)
 		self.album_list_simple(self.ids1)
 		self.song_list_simple(self.albums_ids1)
+
+		self.write_lists_to_files(self.songs_ids1)
 
 run = getLyrics()
 run.program_run()
