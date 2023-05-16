@@ -7,7 +7,8 @@ class Artist():
 		self.ids = ids
 
 class Album():
-	def __init__(self, name = None, ids=None, date=None):
+	def __init__(self, artist, name = None, ids=None, date=None):
+		self.artist = artist
 		self.name = name
 		self.ids = ids
 		self.date = date
@@ -71,30 +72,22 @@ class lyrics():
 
 	def get_artist_ids(self):
 		self.artist_id_scraper.scraper()
-	
+
 	def album_list(self):
 		for artist in self.artists:
 			artist_id_term = artist.ids
 			public_url_albums = f"http://genius.com/api/artists/{artist_id_term}/albums?per_page=50/"
-
-			print(public_url_albums)
 
 			response = requests.get(public_url_albums)
 			album_json_data = response.json()
 
 			for albums in album_json_data['response']['albums']:
 				if albums['_type'] == "album":
-					album = Album()
-
 					album_id = albums['api_path']
-					album.ids = album_id
+					album_name = albums['name']
+					album_date = albums['release_date_for_display']
 
-					albums_name = albums['name']
-					album.name = albums_name
-
-					albums_date = albums['release_date_for_display']
-					album.date = albums_date
-
+					album = Album(artist, album_name, album_id, album_date)
 					self.albums.append(album)
 
 
@@ -109,6 +102,12 @@ class lyrics():
 
 		for album in self.albums:
 			print(album.ids)
+
+		for artist in self.artists:
+			artist_name = artist.name
+			artist_albums = [album for album in self.albums if album.artist.name == artist_name]
+			artist_album_ids = [album.ids for album in artist_albums]
+			print(f"{artist_name} Albums: {artist_album_ids}")
 
 run = lyrics()
 run.get_artist_ids()
