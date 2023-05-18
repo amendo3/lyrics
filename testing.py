@@ -13,6 +13,13 @@ class Album():
 		self.ids = ids
 		self.date = date
 
+class Songs():
+	def __init__(self, artist, name = None, ids = None, date = None):
+		self.artist = artist
+		self.name = name
+		self.ids = ids
+		self.date = date
+
 class artistReader():
 	def __init__(self, filename):
 		self.filename = filename
@@ -57,6 +64,7 @@ class lyrics():
 
 
 		self.albums = []
+		self.songs_list = []
 
 	def artistFolder(self, list):
 		for names in list:
@@ -95,21 +103,56 @@ class lyrics():
 					print('ALBUM LIST ERROR')
 					break
 
+	def song_list(self):
+		for album in self.albums:
+			song_id_term = album.ids
+			public_url_tracklist = f"http://genius.com/api{song_id_term}/tracks"
+
+			response = requests.get(public_url_tracklist)
+			tracklist_json_data = response.json()
+
+
+			for tracks in tracklist_json_data['response']['tracks']:
+				if tracks['song']['_type'] == "song" and tracks['song']['lyrics_state'] == "complete":
+					songs_id = tracks['song']['api_path']
+					full_title = tracks['song']['full_title']
+					songs_date = tracks['song']['release_date_with_abbreviated_month_for_display']
+
+
+					songs = Songs(album.artist, full_title, songs_id, songs_date)
+					self.songs_list.append(songs)
+
+				else:
+					error_url = f"http://genius.com/api{song_id_term}/tracks"
+					print(f"SONG LIST ERROR - {error_url}")
+					continue
+
 
 	def test(self):
-		print([artist.name for artist in self.artists])
-		print([artist.ids for artist in self.artists])
+		# print([artist.name for artist in self.artists])
+		# print([artist.ids for artist in self.artists])
 
-		for album in self.albums:
-			print(album.ids)
+		# for album in self.albums:
+		# 	print(album.ids)
 
-		for artist in self.artists:
-			artist_name = artist.name
-			artist_albums = [album for album in self.albums if album.artist.name == artist_name]
-			artist_album_ids = [album.ids for album in artist_albums]
-			print(f"{artist_name} Albums: {artist_album_ids}")
+		# for artist in self.artists:
+		# 	artist_name = artist.name
+		# 	artist_albums = [album for album in self.albums if album.artist.name == artist_name]
+		# 	artist_album_ids = [album.ids for album in artist_albums]
+		# 	print(f"{artist_name} Albums: {artist_album_ids}")
+
+		for song in self.songs_list:
+			artist_name = song.artist.name
+			song_name = song.name
+			song_ids = song.ids
+			song_date = song.date
+			print(f"Artist: {artist_name}, Song: {song_name}, IDs: {song_ids}, Date: {song_date}")
+
+	def get_html(self):
+		
 
 run = lyrics()
 run.get_artist_ids()
 run.album_list()
+run.song_list()
 run.test()
