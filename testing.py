@@ -1,4 +1,4 @@
-import requests, api_key, reader, os, re, csv
+import requests, api_key, os, re, csv
 from bs4 import BeautifulSoup
 
 class Artist():
@@ -14,11 +14,12 @@ class Album():
 		self.date = date
 
 class Songs():
-	def __init__(self, artist, name = None, ids = None, date = None):
+	def __init__(self, artist, name = None, ids = None, date = None, lyrics = None):
 		self.artist = artist
 		self.name = name
 		self.ids = ids
 		self.date = date
+		self.lyrics = lyrics
 
 class artistReader():
 	def __init__(self, filename):
@@ -67,13 +68,14 @@ class lyrics():
 		self.songs_list = []
 
 	def artistFolder(self, list):
-		for names in list:
-			name = str(names)
-			parent_dir = "/Users/amendo/repos/lyrics/files"
-			path = os.path.join(parent_dir, name)
+		parent_dir = "/Users/amendo/repos/lyrics/files"
+
+		for artist in list:
+			artist_name = artist.name
+			artist_dir = os.path.join(parent_dir, artist_name)
 
 			try:
-				os.mkdir(path)
+				os.mkdir(artist_dir)
 			except OSError as error:
 				print(error)
 
@@ -108,6 +110,8 @@ class lyrics():
 			song_id_term = album.ids
 			public_url_tracklist = f"http://genius.com/api{song_id_term}/tracks"
 
+			print(public_url_tracklist)
+
 			response = requests.get(public_url_tracklist)
 			tracklist_json_data = response.json()
 
@@ -128,18 +132,59 @@ class lyrics():
 					continue
 
 
-	def test(self):
-		# print([artist.name for artist in self.artists])
-		# print([artist.ids for artist in self.artists])
+	def get_html(self):
+		for song in self.songs_list[:10]:
+			url = f"http://genius.com/songs/{song.ids}"
+			page = requests.get(url)
+			html = BeautifulSoup(page.text, "html.parser")
 
-		# for album in self.albums:
-		# 	print(album.ids)
+			for words in html.select('div[class^="Lyrics__Container"]'):
+				for lines in words.select('i, b'):
+					lines.unwrap()
+				words.smooth()
 
-		# for artist in self.artists:
-		# 	artist_name = artist.name
-		# 	artist_albums = [album for album in self.albums if album.artist.name == artist_name]
-		# 	artist_album_ids = [album.ids for album in artist_albums]
-		# 	print(f"{artist_name} Albums: {artist_album_ids}")
+				lyrics = words.get_text(strip=True, separator='\n')
+				if lyrics:
+					song.lyrics = lyrics
+
+		self.artistFolder(self.artists)
+		self.write_lyrics_to_files()
+
+	def write_lyrics_to_files(self):
+		parent_dir = "/Users/amendo/repos/lyrics/files"
+
+		for song in self.songs_list[:10]:
+			artist_name = song.artist.name
+			album_name = song.name
+			lyrics = song.lyrics
+
+			if lyrics is None:
+				continue
+
+			artist_dir = os.path.join(parent_dir, artist_name)
+			album_dir = os.path.join(artist_dir, album_name)
+
+			os.makedirs(album_dir, exist_ok=True)
+
+			filename = f"{album_name}.txt"
+			filepath = os.path.join(album_dir, filename)
+
+			with open(filepath, 'w') as file:
+				file.write(lyrics)
+
+
+	# def test(self):
+	# 	# print([artist.name for artist in self.artists])
+	# 	# print([artist.ids for artist in self.artists])
+
+	# 	# for album in self.albums:
+	# 	# 	print(album.ids)
+
+	# 	# for artist in self.artists:
+	# 	# 	artist_name = artist.name
+	# 	# 	artist_albums = [album for album in self.albums if album.artist.name == artist_name]
+	# 	# 	artist_album_ids = [album.ids for album in artist_albums]
+	# 	# 	print(f"{artist_name} Albums: {artist_album_ids}")
 
 		for song in self.songs_list:
 			artist_name = song.artist.name
@@ -148,11 +193,12 @@ class lyrics():
 			song_date = song.date
 			print(f"Artist: {artist_name}, Song: {song_name}, IDs: {song_ids}, Date: {song_date}")
 
-	def get_html(self):
-		
+
+
 
 run = lyrics()
 run.get_artist_ids()
 run.album_list()
 run.song_list()
-run.test()
+run.get_html()
+# run.test()
