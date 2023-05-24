@@ -1,6 +1,8 @@
+# import statements
 import requests, api_key, os, re, csv
 from bs4 import BeautifulSoup
 
+# class declarations - each are templates for instances to be created that will store various data points
 class Artist():
 	def __init__(self, name, ids=None):
 		self.name = name

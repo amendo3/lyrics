@@ -112,29 +112,45 @@ class albumIdScraper():
 				song_list.append(song)
 
 			else:
-				error_url = f"http://genius.com/api{album_id}/tracks"
-				print(f"SONG LIST ERROR - {error_url}")
+				# error_url = f"http://genius.com/api{album_id}/tracks"
+				# print(f"SONG LIST ERROR - {error_url}")
 				continue
 
 		return song_list
 
 
 class createFolders():
-	def __init__(self, artists):
-		self.artists = artists
+	def __init__(self, albums):
+		self.albums = albums
 		self.parent_dir = "/Users/amendo/repos/lyrics/files"
 
+	def artist_folder(self, artist_name):
+		artist_dir = os.path.join(self.parent_dir, artist_name)
 
-	def artistFolder(self):
-		for artist in self.artists:
-			artist_name = artist.name
-			artist_dir = os.path.join(self.parent_dir, artist_name)
+		try:
+			os.mkdir(artist_dir)
+			# print(f"createFolders - Created Folder: {artist_dir}")
+		except OSError as error:
+			print(error)
+
+		return artist_dir
+
+	def album_folder(self):
+		for album in self.albums:
+			artist_name = album.artist
+			album_name = album.name
+
+			artist_folder = self.artist_folder(artist_name)
+			album_dir = os.path.join(artist_folder, album_name)
 
 			try:
-				os.mkdir(artist_dir)
-				# print(f"createFolders - Created folder: {artist_dir}")
+				os.mkdir(album_dir)
+				# print(f"createFolders - Created Folder: {album_dir}")
 			except OSError as error:
 				print(error)
+
+	def all_folders(self):
+		self.ablum_folders()
 
 
 class logic():
@@ -156,7 +172,7 @@ class logic():
 
 	def create_folders(self):
 		folder_creator = createFolders(self.artists)
-		folder_creator.artistFolder()
+		folder_creator.all_folders()
 
 run = logic()
 run.get_artist_ids()
@@ -182,19 +198,19 @@ run.create_folders()
 
 
 
-print("Albums:")
-for album in run.album_id_scraper.albums:
-    print(f"Artist Name: {album.artist.name}")
-    print(f"Album Name: {album.name}")
-    print(f"Album ID: {album.ids}")
-    print(f"Release Date: {album.date}")
-    print("Songs:")
-    for song in album.songs:
-        print(f"  Song ID: {song.ids}")
-        print(f"  Song Name: {song.name}")
-        print(f"  Song Date: {song.date}")
-        print(f"  Song Artist: {song.artist}")
-    print()
+# print("Albums:")
+# for album in run.album_id_scraper.albums:
+#     print(f"Artist Name: {album.artist.name}")
+#     print(f"Album Name: {album.name}")
+#     print(f"Album ID: {album.ids}")
+#     print(f"Release Date: {album.date}")
+#     print("Songs:")
+#     for song in album.songs:
+#         print(f"  Song ID: {song.ids}")
+#         print(f"  Song Name: {song.name}")
+#         print(f"  Song Date: {song.date}")
+#         print(f"  Song Artist: {song.artist}")
+#     print()
 
 
 
