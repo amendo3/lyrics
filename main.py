@@ -119,41 +119,6 @@ class albumIdScraper():
 		return song_list
 
 
-
-
-# class songListScraper():
-# 	def __init__(self, albums):
-# 		self.albums = albums
-
-# 		self.songs_list = []
-
-# 	def scraper(self):
-# 		for album in self.albums:
-# 			song_id_term = album.ids
-# 			public_url_tracklist = f"http://genius.com/api{song_id_term}/tracks"
-
-# 			# print(public_url_tracklist)
-
-# 			response = requests.get(public_url_tracklist)
-# 			tracklist_json_data = response.json()
-
-
-# 			for tracks in tracklist_json_data['response']['tracks']:
-# 				if tracks['song']['_type'] == "song" and tracks['song']['lyrics_state'] == "complete":
-# 					songs_id = tracks['song']['api_path']
-# 					full_title = tracks['song']['full_title']
-# 					songs_date = tracks['song']['release_date_with_abbreviated_month_for_display']
-
-
-# 					songs = Songs(album.artist, full_title, songs_id, songs_date)
-# 					self.songs_list.append(songs)
-# 					# print(f"songListScraper - Scraped song: {full_title}")
-
-# 				else:
-# 					error_url = f"http://genius.com/api{song_id_term}/tracks"
-# 					# print(f"SONG LIST ERROR - {error_url}")
-# 					continue
-
 class createFolders():
 	def __init__(self, artists):
 		self.artists = artists
@@ -189,10 +154,6 @@ class logic():
 	def get_album_ids(self):
 		self.album_id_scraper.scraper()
 
-	# def get_song_list(self):
-	# 	self.song_list_scraper = songListScraper(self.album_id_scraper.albums)
-	# 	self.song_list_scraper.scraper()
-
 	def create_folders(self):
 		folder_creator = createFolders(self.artists)
 		folder_creator.artistFolder()
@@ -200,7 +161,6 @@ class logic():
 run = logic()
 run.get_artist_ids()
 run.get_album_ids()
-# run.get_song_list()
 run.create_folders()
 
 
@@ -220,15 +180,6 @@ run.create_folders()
 #     print(f"Release Date: {album.date}")
 #     print()
 
-# Print Songs
-# print("Songs:")
-# for song in run.song_list_scraper.songs_list:
-#     print(f"Artist Name: {song.artist.name}")
-#     print(f"Song Name: {song.name}")
-#     print(f"Song ID: {song.ids}")
-#     print(f"Release Date: {song.date}")
-#     print(f"Lyrics: {song.lyrics}")
-#     print()
 
 
 print("Albums:")
